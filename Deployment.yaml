@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: finsights-app
+  labels:
+    app: finsights
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: finsights
+  template:
+    metadata:
+      labels:
+        app: finsights
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8084"
+        prometheus.io/path: "/actuator/prometheus"
+    spec:
+      containers:
+      - name: finsights-app
+        image: mopada/sample-app
+        ports:
+        - containerPort: 8084
+        - containerPort: 8086
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8084
+          initialDelaySeconds: 5
+          periodSeconds: 10
